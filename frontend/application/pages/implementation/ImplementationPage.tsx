@@ -23,16 +23,31 @@ const ImplementationPage = () => {
 
     const callElevator = async (floor: number) => {
         // Reseve the closest elevator
-        const new_elevator = await axios.get<Elevator>(`${API_URL}/reserve/${floor}`)
-        const elevator = elevators.find(e => e.id === new_elevator.data.id);
-        if (!elevator) return 
+        const res = await axios.post<Elevator>(`${API_URL}/reserve`, { floor })
+
+        if(res.status !== 202) {
+            setError("Something went wrong")
+            return;
+        }
+
+        const new_elevator = res.data as Elevator;
+        const elevator = elevators.find(e => e.id === new_elevator.id);
+
+        if (!elevator) {
+            setError("Something went wrong");
+            return 
+        }
+        
+        // Indicate the elevator is moving
         setRequestedFloor(floor);
-        elevator.floor = new_elevator.data.floor;
-        elevator.direction = new_elevator.data.direction;
-        elevator.destination = new_elevator.data.destination;
+        
+        elevator.floor = new_elevator.floor;
+        elevator.direction = new_elevator.direction;
+        elevator.destination = new_elevator.destination;
+        
         setElevators([...elevators]);
 
-        // Move the elevator to the floor
+        // Make a new request for the elevator to be moved to the floor
         axios.post<Elevator>(`${API_URL}/call`, { floor: floor })
             .then((res) => {
                 console.log("callElevator 2",res.data)
