@@ -1,10 +1,10 @@
 # Elevator system
 > **Please select the socket branch for the best functinallity**
 ## Description
-A backend system for calling elevators to specific floors with a simple frontend to visualize the elevators.
+A backend system made for calling elevators to specific floors with a simple frontend to visualize the elevators.
 
 ## 🚀 Running
-There are **two** version of the project, one strictly using a REST API and the other one relying on Websockets. 
+There are **two** versions of the project, one strictly using a REST API and the other one relying on Websockets. 
 
 Both the frontend and the backend has the following npm scripts
 * `npm run clean`
@@ -15,9 +15,9 @@ Both the frontend and the backend has the following npm scripts
     * Runs the application locally
 
 ## 💻 Using
-Press one out of the 20 buttons in the UI to call an elevator to that floor. If you wish to call multiple elevators the system will decide which elevator is closest and choose that one. If the elevator is close but busy, the system will wait for that elevator to finish until moving on to the next floor in the queue. 
+Press one out of the 20 buttons in the UI to call an elevator to that floor. If you wish to call on multiple elevators, the system will decide which elevator is closest and choose that one. If the elevator is close but busy, the system will wait for that elevator to finish until moving on to the next floor in the queue. 
 
-Multiple elevators can run at the same time without problem. 
+Multiple elevators can run at the same time without any problem. 
 
 ## 🧪 Tests
 The backend has a few tests to ensure the functionality of the elevator is working.
