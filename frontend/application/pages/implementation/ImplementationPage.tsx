@@ -27,6 +27,7 @@ const ImplementationPage = () => {
     const [socket, setSocket] = useState(null);
 
     const callElevator = async (floor: number) => {
+        setRequestedFloor(floor);
         socket.emit("call", floor);
     };
 
