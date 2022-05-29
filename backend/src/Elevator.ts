@@ -1,3 +1,5 @@
+const logger = require("./utils/logger");
+
 export interface ElevatorProps {
     id: number;
     floor: number;
@@ -64,7 +66,11 @@ export class Elevator {
             // For each floor, move the elevator to the next floor
             for (let i = 1; i <= floorDelta; i++) {
                 await this.moveOneFloor(this.direction)
-                socket.emit("status", ELEVATORS);
+                try {
+                    socket.emit("status", ELEVATORS);
+                }   catch (e) {
+                    logger.error(e);
+                }
             }
 
             this.direction = Direction.IDLE;

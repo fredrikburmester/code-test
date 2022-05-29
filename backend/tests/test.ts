@@ -10,7 +10,8 @@ describe('Elevator', async function () {
 		})
 		it('should have moved to floor 2', async function () {
 			const e1 = new Elevator(1, 1)
-			await e1.move(2)
+			e1.queue.push(2);
+			await e1.move(null, [e1])
 			assert (e1.floor === 2)
 		})
 		it('elevator on floor 1 should be closest to floor 2', async function () {
@@ -37,14 +38,16 @@ describe('Elevator', async function () {
 			const e1 = new Elevator(1, 1)
 			const e2 = new Elevator(2, 5)
 			const closest = findClosestElevator([e1, e2], 2)
-			await closest.move(2)
+			closest.queue.push(2);
+			await closest.move(null, [e1, e2])
 			assert (e1.floor === 2)
 		})
 		it('evelator on floor 5 should have moved to floor 4', async function () {
 			const e1 = new Elevator(1, 1)
 			const e2 = new Elevator(2, 5)
 			const closest = findClosestElevator([e1, e2], 4)
-			await closest.move(4)
+			closest.queue.push(4);
+			await closest.move(null, [e1, e2])
 			assert (e2.floor === 4)
 		})
 	})
