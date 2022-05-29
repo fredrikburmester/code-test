@@ -44,6 +44,7 @@ export class Elevator {
          * @return {Promise<number>} - The floor the elevator is on
          */
 
+        // Wait until the elevator is idle before moving on to the next floor in the queue
         while(this.direction !== Direction.IDLE) {
             await new Promise(resolve => setTimeout(resolve, 1000));
         }
@@ -62,10 +63,12 @@ export class Elevator {
         this.destination = floor;
         this.direction = floor > this.floor ? Direction.UP : Direction.DOWN;
 
+        // Move the elevator to the floor one floor at a time
         return new Promise(async (resolve, reject) => {            
-            // For each floor, move the elevator to the next floor
             for (let i = 1; i <= floorDelta; i++) {
                 await this.moveOneFloor(this.direction)
+
+                // Send the elevator's current floor to the client
                 try {
                     socket.emit("status", ELEVATORS);
                 }   catch (e) {
