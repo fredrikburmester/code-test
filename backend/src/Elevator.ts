@@ -23,37 +23,73 @@ export class Elevator {
      */
     id: number
     floor: number
-    direction: string
+    direction: Direction
     destination: number
     queue: number[]
 
     constructor(id: number, floor: number) {
         this.id = id;
         this.floor = floor;
-        this.direction = "idle";
+        this.direction = Direction.IDLE;
         this.destination = null;
         this.queue = [];
     }
-    
-    move(floor: number): Promise<number> {
+
+    async move(socket, ELEVATORS): Promise<number> {
         /**
          * Moves the elevator to the given floor
          *
          * @return {Promise<number>} - The floor the elevator is on
          */
-        if(floor === this.floor) {
-            return Promise.resolve(floor);
+
+        while(this.direction !== Direction.IDLE) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+        
+        const floor = this.queue.shift();
+
+        if (floor === undefined) {
+            return Promise.resolve(this.floor);
         }
 
+        if(floor === this.floor) {
+            this.destination = floor;
+            return Promise.resolve(floor);
+        }
         const floorDelta = Math.abs(floor - this.floor);
+        this.destination = floor;
+        this.direction = floor > this.floor ? Direction.UP : Direction.DOWN;
 
-        return new Promise((resolve, reject) => {            
+        return new Promise(async (resolve, reject) => {            
+            // For each floor, move the elevator to the next floor
+            for (let i = 1; i <= floorDelta; i++) {
+                await this.moveOneFloor(this.direction)
+                console.log(`Elevator ${this.id} is on floor ${this.floor}`);
+                socket.emit("status", ELEVATORS);
+            }
+
+            this.direction = Direction.IDLE;
+            this.destination = floor;
+            resolve(this.floor);
+        });
+    }
+
+    moveOneFloor(direction: Direction): Promise<number> {
+        /**
+         * Moves the elevator one floor in the given direction
+         *
+         * @return {Promise<number>} - The floor the elevator is on
+         */
+        return new Promise((resolve, reject) => {
             setTimeout(() => {
-                this.floor = floor;
-                this.direction = "idle";
-                this.destination = floor;
+                if (direction === Direction.UP) {
+                    this.floor++;
+                } else {
+                    this.floor--;
+                }
+
                 resolve(this.floor);
-            }, 2000 * floorDelta);
+            }, 2000);
         });
     }
 }
