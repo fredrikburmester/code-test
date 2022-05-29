@@ -13,6 +13,11 @@ Both the frontend and the backend has the following npm scripts
 * `npm run develop`
     * Runs the application locally
 
+## 💻 Using
+Press one out of the 20 buttons in the UI to call an elevator to that floor. If you which to call multiple elevators the system will decide which elevator is closest and choose that one. If the elevator is close but busy, the system will wait for that elevator to finish until moving on to the next floor in the queue. 
+
+Multiple elevators can run at the same time without problem. 
+
 ## 🧪 Tests
 The backend has a few tests to ensure the functionality of the elevator is working.
 
