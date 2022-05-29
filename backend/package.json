@@ -43,6 +43,7 @@
 		"koa-bodyparser": "^4.3.0",
 		"koa-router": "^9.0.1",
 		"socket.io": "^4.5.1",
-		"typera-koa": "^2.4.4"
+		"typera-koa": "^2.4.4",
+		"winston": "^3.7.2"
 	}
 }
