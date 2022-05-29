@@ -64,7 +64,6 @@ export class Elevator {
             // For each floor, move the elevator to the next floor
             for (let i = 1; i <= floorDelta; i++) {
                 await this.moveOneFloor(this.direction)
-                console.log(`Elevator ${this.id} is on floor ${this.floor}`);
                 socket.emit("status", ELEVATORS);
             }
 
