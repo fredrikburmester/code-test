@@ -4,6 +4,7 @@ const app = express();
 const http = require('http');
 const server = http.createServer(app);
 const { Elevator, Direction, ElevatorProps } = require('./Elevator');
+const logger = require("./utils/logger");
 
 import cors = require("cors");
 
@@ -73,14 +74,17 @@ app.get('/elevators/status', (req, res) => {
 });
 
 io.on('connection', (socket: any) => {
+    logger.info(`Elevator client connected: ${socket.id}`);
     socket.emit("status", ELEVATORS);
 
     socket.on("call", async (floor: number) => {
         const closestElevator = findClosestElevator(ELEVATORS, floor);
+        logger.info(`Elevator ${closestElevator.id} (${closestElevator.direction}) requested to floor: ${floor}`);
         closestElevator.queue.push(floor);
 
         // This async function is called when the elevator has reached the floor
         closestElevator.move(socket, ELEVATORS).then(() => {
+            logger.info(`Elevator ${closestElevator.id} has reached floor: ${closestElevator.floor}`);
             socket.emit("status", ELEVATORS);
         })
 
@@ -90,5 +94,5 @@ io.on('connection', (socket: any) => {
 });
 
 server.listen(3000, () => {
-    console.log('listening on *:3000');
+    logger.info('Elevator server is running on http://localhost:3000');
 });
