@@ -1,14 +1,17 @@
 import * as React from "react";
 import { useEffect,useState } from "react";
-
+import socketIOClient from "socket.io-client";
 import * as css from "./ImplementationPage.module.scss";
 import axios from "axios";
+
+const ENDPOINT = "http://localhost:3000";
 
 interface Elevator {
     id: number,
     floor: number,
     direction: string,
     destination: number,
+    queue: number[],
 }
 
 const API_URL = 'http://localhost:3000/elevators'
@@ -21,71 +24,26 @@ const ImplementationPage = () => {
     const [loading, setLoading]: [boolean, (loading: boolean) => void] = useState<boolean>(true);
     const [error, setError]: [string, (error: string) => void] = useState("");
 
+    const [socket, setSocket] = useState(null);
+
     const callElevator = async (floor: number) => {
-        // Reseve the closest elevator
-        const res = await axios.post<Elevator>(`${API_URL}/reserve`, { floor })
-
-        if(res.status !== 202) {
-            setError("Something went wrong")
-            return;
-        }
-
-        const new_elevator = res.data as Elevator;
-        const elevator = elevators.find(e => e.id === new_elevator.id);
-
-        if (!elevator) {
-            setError("Something went wrong");
-            return 
-        }
-        
-        // Indicate the elevator is moving
-        setRequestedFloor(floor);
-        
-        elevator.floor = new_elevator.floor;
-        elevator.direction = new_elevator.direction;
-        elevator.destination = new_elevator.destination;
-        
-        setElevators([...elevators]);
-
-        // Make a new request for the elevator to be moved to the floor
-        axios.post<Elevator>(`${API_URL}/call`, { floor: floor })
-            .then((res) => {
-                console.log("callElevator 2",res.data)
-                
-                // find and update the elevator
-                const elevator = elevators.find(e => e.id === res.data.id);
-                if (!elevator) return 
-
-                elevator.floor = res.data.floor;
-                elevator.direction = res.data.direction;
-                elevator.destination = res.data.destination;
-                setElevators([...elevators]);
-            })
-            .catch((error) => {
-                setError(error.message);
-            });
+        socket.emit("call", floor);
     };
 
     useEffect(() => {
-        axios
-            .get<Elevator[]>(`${API_URL}/status`)
-            .then(response => {
-                setElevators(response.data);
-                setLoading(false);
-            })
-            .catch(ex => {
-                console.log(ex)
-                let error = ex
-                if(ex?.response && ex?.response?.data) {
-                error =
-                    ex.response.status === 404
-                    ? "Resource Not found"
-                    : "An unexpected error has occurred";
-                }
-                setError(error);
-                setLoading(false);
-            });
-        }, []);
+        const socket = socketIOClient(ENDPOINT);
+        setSocket(socket);
+
+        socket.on("status", (data: Elevator[]) => {
+            console.log(data)
+            setElevators(data);
+            setLoading(false);
+        });
+
+        socket.on("elevator", (data: Elevator) => {
+            console.log(data)
+        });
+    }, [setSocket]);
 
     return (
         <>
@@ -110,6 +68,7 @@ const ImplementationPage = () => {
                                     <td>{elevator.floor}</td>
                                     <td>{elevator.direction}</td>
                                     <td>{elevator.destination}</td>
+                                    {elevator.queue.length > 0 && <td>{elevator.queue.join(", ")}</td>}
                                 </tr>
                             )}
                         </tbody>
