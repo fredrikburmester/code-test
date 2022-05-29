@@ -2,7 +2,7 @@ import * as cors from "kcors";
 import * as Koa from "koa";
 import * as bodyparser from "koa-bodyparser";
 import * as Router from "koa-router";
-import { Elevator } from "./elevator";
+import { Elevator, Direction, ElevatorProps } from "./elevator";
 
 const app = new Koa();
 const router = new Router();
@@ -30,12 +30,28 @@ export const findClosestElevator = (elevators: Elevator[], floor: number) => {
     }
 
     let closest = elevators[0];
-    elevators.forEach((e) => {
-            if (Math.abs(e.floor - floor) < Math.abs(closest.floor - floor)) {
+
+    const sortedElevators = elevators.sort((a, b) => {
+        const aDelta = Math.abs(a.floor - floor);
+        const bDelta = Math.abs(b.floor - floor);
+
+        return aDelta - bDelta;
+    });
+
+    console.log(sortedElevators);
+
+    // Pick first not idle elevator
+    for(let i = 0; i < sortedElevators.length; i++) {
+        const e = sortedElevators[i];
+        if(e.direction !== Direction.IDLE) {
             closest = e;
-            }
+            break;
         }
-    );
+    }
+
+    if (closest.direction === Direction.IDLE) {
+        return sortedElevators[0];
+    }
 
     return closest;
 }
@@ -47,8 +63,10 @@ router.get("/elevators/status", (context) => {
 });
 
 // Get the closest elevator to a floor and reserve it to be moved
-router.get("/elevators/reserve/:floor", (context) => {
-    const floor = parseInt(context.params.floor);
+router.post("/elevators/reserve", (context) => {
+
+    const floor = parseInt(context.request.body.floor);
+    console.log(context.request.body.floor)
 
     if(floor < 1 || floor > NR_OF_FLOORS) {
         context.response.body = "Floor out of range";
@@ -57,18 +75,19 @@ router.get("/elevators/reserve/:floor", (context) => {
     }
     
     const closestElevator = findClosestElevator(ELEVATORS, floor);
+
     closestElevator.destination = parseInt(context.params.floor);
     closestElevator.destination = floor;
     if (closestElevator.floor < floor) {
-        closestElevator.direction = "up";
+        closestElevator.direction = Direction.UP;
     } else if (closestElevator.floor > floor) {
-        closestElevator.direction = "down";
+        closestElevator.direction = Direction.DOWN;
     } else {
-        closestElevator.direction = "idle";
+        closestElevator.direction = Direction.IDLE;
     }
 
     context.response.body = closestElevator;
-    context.response.status = 200;
+    context.response.status = 202;
 })
 
 // Get the elevator with the closest floor to the requested floor
