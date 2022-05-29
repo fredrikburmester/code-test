@@ -4,7 +4,9 @@
 A backend system made for calling elevators to specific floors with a simple frontend to visualize the elevators.
 
 ## 🚀 Running
-There are **two** versions of the project, one strictly using a REST API and the other one relying on Websockets. 
+There are **two** versions of the project, one strictly using a REST API and the other one relying on Websockets. Using WebSockets, we can continuously update the client with the latest information about the elevators without the client having to call on multiple requests.
+
+Using websockets, 
 
 Both the frontend and the backend has the following npm scripts
 * `npm run clean`
