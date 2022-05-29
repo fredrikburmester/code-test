@@ -1,8 +1,10 @@
-# Stabelo code test
+# Elevator system
 ## Description
-This is the code skeleton for the stabelo code test. It provides initial setup for frontend and backend in the intrest of saving time. It consists of two projects. Frontend and backend. Frontend has a simple react ui set up and the backend has a simple rest controller sample.
+A backend system for calling elevators to specific floors with a simple frontend to visualize the elevators.
 
-## Running
+## 🚀 Running
+There are **two** version of the project, one strictly using a REST API and the other one relying on Websockets. 
+
 Both the frontend and the backend has the following npm scripts
 * `npm run clean`
     * Used to clean the workspace
@@ -11,3 +13,14 @@ Both the frontend and the backend has the following npm scripts
 * `npm run develop`
     * Runs the application locally
 
+## 🧪 Tests
+The backend has a few tests to ensure the functionality of the elevator is working.
+
+To run the tests from the backend folder:
+* `npm run test`
+
+## 📂 Logging
+The logging on the server is using [Winston](https://github.com/winstonjs/winston) and all logs are written to a log file.
+
+To tail the logs, run from the backend folder:
+* `tail -f ./logs/server.log`
