@@ -3,7 +3,6 @@
 	"version": "0.0.1",
 	"description": "Stabelo code test backend",
 	"main": "target/index.js",
-	"type": "module",
 	"private": true,
 	"scripts": {
 		"test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register 'tests/*.ts' --timeout 5000",
